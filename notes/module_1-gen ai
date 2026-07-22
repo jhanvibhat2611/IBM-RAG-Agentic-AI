@@ -1,0 +1,92 @@
+# Module 1 - Generative AI
+
+## Discriminative AI vs Generative AI
+
+### Discriminative AI
+
+- Discriminative AI is mostly used for classification.
+- It basically distinguishes between different classes of data.
+- It is more focused on analytical and predictive tasks.
+
+### Limitations of Discriminative AI
+
+- It is not context-aware.
+- It cannot generate new data.
+- It can only classify or predict based on the data it has.
+
+---
+
+### Generative AI
+
+- Generative AI is capable of generating new data.
+- It generates data based on the input provided by the user.
+- The input is given in the form of a **prompt**.
+
+A prompt can be:
+- Text
+- Image
+- Audio
+- Or other forms of input.
+
+One interesting thing is that the output does not necessarily have to be in the same format as the input.
+
+For example:
+- Input → Text prompt
+- Output → Image
+
+or vice versa.
+
+Generative AI is mainly focused on creativity and content generation.
+
+---
+
+## Difference Between Discriminative AI and Generative AI
+
+Discriminative AI focuses on analytical and predictive tasks.
+
+Generative AI focuses on creative tasks by generating completely new content.
+
+### Example
+
+Suppose we have an image.
+
+Using **Discriminative AI**, we can classify whether the image contains a nest or an egg.
+
+Using **Generative AI**, we can give a prompt like:
+
+> "Generate an image of a bird's nest with eggs."
+
+and it can create a completely new image.
+
+---
+
+## Neural Networks
+
+Generative AI is mainly built using neural networks.
+
+We already know that neural networks are inspired by the human brain.
+
+A **neuron** is the basic unit of a neural network and is modeled after the way neurons work in the human brain.
+
+When many artificial neural networks are trained on massive amounts of data, it is called **Deep Learning**.
+
+---
+
+## Technologies Used in Generative AI
+
+Generative AI develops creativity using:
+
+- Generative Adversarial Networks (GANs)
+- Variational Autoencoders (VAEs)
+- Transformers
+- Diffusion Models
+
+---
+
+## Foundation Models
+
+Foundation models are AI models with broad capabilities.
+
+They are trained on huge amounts of data and can later be adapted for specific tasks or applications.
+
+One example of a foundation model is an **LLM (Large Language Model)**.
