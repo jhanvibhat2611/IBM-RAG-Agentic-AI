@@ -115,3 +115,121 @@ This review is part of the feedback collected for a recently launched product.
 ### Output Indicator
 
 Sentiment:
+
+---
+
+# Advanced Prompt Engineering Techniques
+
+## 1. Zero-Shot Prompting
+
+Zero-shot prompting is when we ask an LLM to perform a task **without giving it any examples** related to that task.
+
+The model relies only on the knowledge it has already learned during training.
+
+### Example
+
+Instruction:
+
+> Classify the following statement as True or False.
+
+Statement:
+
+> India Gate is located in Bihar.
+
+The LLM is expected to answer correctly without being shown any similar examples beforehand.
+
+---
+
+## 2. One-Shot Prompting
+
+As the name suggests, one-shot prompting provides **one example** before asking the actual question.
+
+The example helps the LLM understand the pattern that it needs to follow.
+
+### Example
+
+English: Good morning.
+
+French: Bonjour.
+
+Now translate:
+
+English: Thank you.
+
+The LLM uses the single example to understand what it is expected to do.
+
+---
+
+## 3. Few-Shot Prompting
+
+Few-shot prompting is similar to one-shot prompting, except that we provide **multiple examples** instead of just one.
+
+The LLM learns the pattern from these examples and then applies the same pattern to the new input.
+
+Generally, few-shot prompting performs better than one-shot prompting because the model has more examples to learn from.
+
+---
+
+## 4. Chain of Thought (CoT) Prompting
+
+Chain of Thought prompting guides the LLM to solve a problem **step by step**, similar to how a human would think through a complex problem.
+
+Instead of directly asking for the final answer, we encourage the model to explain its reasoning before reaching the conclusion.
+
+This technique is especially useful for complex reasoning tasks and multi-step problems.
+
+---
+
+## 5. Self-Consistency
+
+Self-consistency is used to improve the **accuracy and reliability** of the final answer.
+
+Instead of generating only one solution, we ask the LLM to generate **multiple independent reasoning paths** for the same question.
+
+The final answer is then selected based on the most consistent result among those different reasoning paths.
+
+This increases confidence that the answer is correct.
+
+---
+
+# Prompt Templates (LangChain)
+
+LangChain provides **Prompt Templates**, which are basically predefined templates for generating effective prompts.
+
+Instead of writing the entire prompt every time, we create a template with placeholders that can be replaced later.
+
+This helps us generate multiple prompts while keeping the overall structure the same.
+
+Prompt templates can include:
+
+- Instructions
+- Context
+- Few-shot examples
+- Variables (placeholders)
+
+### Example
+
+Template:
+
+```
+Tell me a {adjective} joke about {topic}.
+```
+
+Here,
+
+- `{adjective}` is a variable.
+- `{topic}` is another variable.
+
+When formatting the prompt, we can replace these placeholders with different values.
+
+Example:
+
+```
+Tell me a funny joke about programming.
+
+Tell me a dark joke about football.
+
+Tell me a sarcastic joke about AI.
+```
+
+The structure of the prompt remains the same, while the variables change depending on the situation.
