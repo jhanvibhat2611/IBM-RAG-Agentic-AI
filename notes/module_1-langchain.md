@@ -67,3 +67,94 @@ LangChain works really well with vector databases.
 Vector databases are mainly used for **semantic search**, where the search is based on meaning instead of exact keyword matching.
 
 Since LLM applications often deal with huge amounts of data, LangChain and vector databases are commonly used together in AI applications.
+
+---
+
+# LangChain Expression Language (LCEL)
+
+## What is LCEL?
+
+LCEL stands for **LangChain Expression Language**.
+
+It is basically a way of connecting different LangChain components using the **pipe (`|`) operator**.
+
+Because of this, the flow of data becomes much cleaner and more readable.
+
+---
+
+## Basic Workflow
+
+The basic workflow while using LCEL is:
+
+1. Define a prompt template with variables inside curly braces `{}`.
+2. Create a PromptTemplate instance.
+3. Build a chain by connecting different components using the **pipe (`|`) operator**.
+4. Invoke the chain by passing values for the variables in the prompt template.
+
+---
+
+# Runnables
+
+In LangChain, **Runnables** are basically the building blocks used to create AI pipelines.
+
+They provide a common interface for connecting different components such as:
+
+- LLMs
+- Retrievers
+- Prompt Templates
+- Output Parsers
+- Other tools
+
+Since every component follows the same interface, they can easily be connected together.
+
+---
+
+# Runnable Composition
+
+There are two main ways of composing runnables.
+
+## 1. RunnableSequence
+
+As the name suggests, it connects components **sequentially**.
+
+The output of one component becomes the input of the next component.
+
+Example:
+
+```
+Prompt → LLM → Output Parser
+```
+
+---
+
+## 2. RunnableParallel
+
+Again, as the name suggests, multiple components run **in parallel**.
+
+All of them receive the **same input** and execute simultaneously.
+
+This is useful when we want multiple independent outputs from the same input.
+
+---
+
+# How LCEL helps
+
+Normally, we would explicitly create a `RunnableSequence`.
+
+With LCEL, we don't have to do that.
+
+Instead, we simply connect components using the **pipe (`|`) operator**.
+
+Example (conceptually):
+
+```
+Prompt | LLM | Output Parser
+```
+
+This is much cleaner and easier to read.
+
+---
+
+Another useful thing is that LCEL automatically converts compatible objects into Runnable components whenever possible.
+
+Because of this, we usually don't have to manually convert everything ourselves.
