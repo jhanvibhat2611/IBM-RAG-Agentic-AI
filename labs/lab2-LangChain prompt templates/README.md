@@ -961,3 +961,467 @@ The pipeline remains exactly the same.
 - LCEL connects prompt formatting, the LLM, and output parsing into a single workflow.
 - The same pipeline can classify different types of text by changing only the inputs, making the code reusable and modular.
 
+---
+
+# Example: SQL Query Generation using PromptTemplate + LCEL
+
+## Objective
+
+Generate an SQL query from a natural language description.
+
+Instead of manually writing SQL, we describe what we want in plain English, and the LLM converts it into the corresponding SQL query.
+
+---
+
+## Code Walkthrough
+
+### 1. Store the Query Description
+
+```python
+description = """
+Retrieve the names and email addresses of all customers from the 'customers' table who have made a purchase.
+The table 'purchases' contains a column 'purchase_date'.
+"""
+```
+
+### What does this do?
+
+The task is described in natural language.
+
+Instead of writing SQL ourselves, we explain what data we want to retrieve.
+
+This description becomes the input for the LLM.
+
+---
+
+### 2. Create the Prompt Template
+
+```python
+template = """
+Generate an SQL query based on the {description}
+
+SQL Query:
+"""
+```
+
+### What does this do?
+
+The PromptTemplate tells the LLM exactly what task it should perform.
+
+It contains one placeholder:
+
+- `{description}` → the natural language description of the required SQL query.
+
+Whenever a different description is provided, LangChain automatically inserts it into the prompt.
+
+---
+
+### 3. Convert to a PromptTemplate
+
+```python
+prompt = PromptTemplate.from_template(template)
+```
+
+### What does this do?
+
+This converts the template string into a reusable PromptTemplate.
+
+The same template can generate SQL for many different database queries by simply changing the value of `description`.
+
+---
+
+### 4. Create the LCEL Chain
+
+```python
+sql_generation_chain = (
+
+    RunnableLambda(format_prompt)
+
+    |
+
+    llm
+
+    |
+
+    StrOutputParser()
+
+)
+```
+
+### What does this do?
+
+The LCEL chain connects three components:
+
+- **RunnableLambda(format_prompt)** → fills the `{description}` placeholder.
+- **llm** → generates the SQL query.
+- **StrOutputParser()** → converts the model output into a plain string.
+
+Each component passes its output to the next using the pipe operator (`|`).
+
+---
+
+### 5. Execute the Chain
+
+```python
+sql_query = sql_generation_chain.invoke({
+    "description": description
+})
+```
+
+### What does this do?
+
+The description is passed to the PromptTemplate.
+
+The pipeline then:
+
+- formats the prompt,
+- sends it to the LLM,
+- generates an SQL query,
+- returns the final SQL statement.
+
+---
+
+## Overall Workflow
+
+```
+Natural Language Description
+
+↓
+
+PromptTemplate
+
+↓
+
+Formatted Prompt
+
+↓
+
+LLM
+
+↓
+
+Generated SQL Query
+
+↓
+
+Output Parser
+
+↓
+
+Final SQL Statement
+```
+
+---
+
+## Why is this useful?
+
+Many users know **what information they need** but don't know SQL syntax.
+
+Instead of writing SQL manually, they can simply describe the required data in plain English.
+
+The LLM then converts the natural language request into an SQL query, making database interaction much easier.
+
+This is commonly used in AI-powered database assistants and analytics tools.
+
+---
+
+## Key Takeaways
+
+- Natural language is used instead of manually writing SQL.
+- PromptTemplate makes the solution reusable for different database queries.
+- LCEL handles prompt formatting, LLM execution, and output parsing in one pipeline.
+- The same workflow can generate different SQL queries simply by changing the description.
+
+---
+
+# Example: Role-Based Chatbot using PromptTemplate + LCEL
+
+## Objective
+
+Build an interactive chatbot where the LLM behaves as a specific role or persona.
+
+Instead of only asking a question, we also specify:
+
+- **who the LLM should act as**
+- **how it should respond**
+
+This allows us to reuse the same chatbot for different applications simply by changing the role or tone.
+
+---
+
+## Code Walkthrough
+
+### 1. Define the Role
+
+```python
+role = """
+Dungeon & Dragons game master
+"""
+```
+
+### What does this do?
+
+This variable defines the **persona** the LLM should adopt.
+
+Instead of answering as a generic AI assistant, the model will answer as a Dungeon & Dragons game master.
+
+Changing this variable changes the chatbot's behavior without changing the rest of the code.
+
+Examples:
+
+- Python Tutor
+- Career Advisor
+- Doctor
+- Interviewer
+- Travel Guide
+
+---
+
+### 2. Define the Tone
+
+```python
+tone = "engaging and immersive"
+```
+
+### What does this do?
+
+The tone specifies **how** the model should communicate.
+
+It doesn't change the knowledge of the model—it changes the style of the response.
+
+Examples:
+
+- Professional
+- Friendly
+- Formal
+- Humorous
+- Motivational
+
+---
+
+### 3. Create the Prompt Template
+
+```python
+template = """
+You are an expert {role}.
+
+I have this question {question}.
+
+I would like our conversation to be {tone}.
+
+Answer:
+"""
+```
+
+### What does this do?
+
+This PromptTemplate combines three pieces of information:
+
+- `{role}` → Who the LLM should act as.
+- `{question}` → The user's input.
+- `{tone}` → The communication style.
+
+Every time the chatbot is used, these placeholders are automatically replaced with the provided values.
+
+---
+
+### 4. Convert to a PromptTemplate
+
+```python
+prompt = PromptTemplate.from_template(template)
+```
+
+### What does this do?
+
+This converts the template into a reusable PromptTemplate.
+
+Now the chatbot can easily switch roles or tones without rewriting the prompt.
+
+---
+
+### 5. Create the LCEL Chain
+
+```python
+roleplay_chain = (
+
+    RunnableLambda(format_prompt)
+
+    |
+
+    llm
+
+    |
+
+    StrOutputParser()
+
+)
+```
+
+### What does this do?
+
+The chain connects three components:
+
+- **RunnableLambda(format_prompt)** → fills the placeholders.
+- **llm** → generates the response.
+- **StrOutputParser()** → converts the output into a plain string.
+
+The pipe operator (`|`) automatically passes the output of one component to the next.
+
+---
+
+### 6. Create an Interactive Chat Loop
+
+```python
+while True:
+```
+
+### What does this do?
+
+The chatbot keeps running continuously.
+
+Instead of asking only one question, it allows the user to keep chatting until they decide to exit.
+
+---
+
+### 7. Read User Input
+
+```python
+query = input("Question: ")
+```
+
+### What does this do?
+
+This waits for the user to type a question.
+
+The question is stored in the `query` variable and will replace the `{question}` placeholder in the PromptTemplate.
+
+---
+
+### 8. Exit the Chat
+
+```python
+if query.lower() in ["quit", "exit", "bye"]:
+    print("Answer: Goodbye!")
+    break
+```
+
+### What does this do?
+
+Checks whether the user wants to end the conversation.
+
+If the input is:
+
+- quit
+- exit
+- bye
+
+the loop stops and the chatbot exits gracefully.
+
+---
+
+### 9. Invoke the Chain
+
+```python
+response = roleplay_chain.invoke({
+    "role": role,
+    "question": query,
+    "tone": tone
+})
+```
+
+### What does this do?
+
+The values are passed as a dictionary.
+
+LangChain automatically:
+
+- replaces the placeholders,
+- creates the final prompt,
+- sends it to the LLM,
+- generates the response,
+- returns the final answer.
+
+---
+
+### 10. Print the Response
+
+```python
+print("Answer:", response)
+```
+
+### What does this do?
+
+Displays the chatbot's generated response to the user.
+
+The loop then starts again, allowing another question to be asked.
+
+---
+
+## Overall Workflow
+
+```
+Role
+
++
+
+Tone
+
++
+
+User Question
+
+↓
+
+PromptTemplate
+
+↓
+
+Formatted Prompt
+
+↓
+
+LLM
+
+↓
+
+Generated Response
+
+↓
+
+Output Parser
+
+↓
+
+Displayed to User
+
+↓
+
+Wait for Next Question
+```
+
+---
+
+## Why is this useful?
+
+This is one of the simplest ways to build a conversational AI assistant.
+
+Instead of hardcoding different chatbots, we simply change:
+
+- the role,
+- the tone,
+- or the prompt,
+
+while keeping the same LCEL pipeline.
+
+This makes the chatbot flexible and reusable for many different applications.
+
+---
+
+## Key Takeaways
+
+- PromptTemplates can define the LLM's role or persona.
+- Tone controls the style of the response without changing the model itself.
+- LCEL connects prompt formatting, the LLM, and output parsing into a reusable pipeline.
+- The chatbot runs continuously using a `while` loop until the user exits.
+- The same chatbot can become a tutor, interviewer, travel guide, coding assistant, or customer support agent simply by changing the role and tone.
+
