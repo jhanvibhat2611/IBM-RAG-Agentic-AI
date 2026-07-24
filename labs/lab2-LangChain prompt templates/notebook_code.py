@@ -1,3 +1,5 @@
+from idlelib.outwin import OutputWindow
+
 template = """Tell me a {adjective} joke about {content}.
 """
 prompt = PromptTemplate.from_template(template)
@@ -89,3 +91,30 @@ print(answer)
 # Output
 # The rocky, solid planets in our solar system are Mercury, Venus, Earth, and Mars.
 
+text = """
+    The concert last night was an exhilarating experience with outstanding performances by all artists.
+"""
+
+categories = "Entertainment, Food and Dining, Technology, Literature, Music."
+
+template = """
+    Classify the {text} into one of the {categories}.
+
+    Category:
+
+"""
+prompt = PromptTemplate.from_template(template)
+
+# Create the LCEL chain
+classification_chain = (
+        RunnableLambda(format_prompt)
+        | llm
+        | StrOutputParser()
+)
+
+# Run the chain
+category = classification_chain.invoke({"text": text, "categories": categories})
+print(category)
+
+# Output
+# Music

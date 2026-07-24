@@ -767,3 +767,197 @@ Although this example uses a small paragraph, the same workflow is later used in
 - PromptTemplate automatically fills the placeholders.
 - LCEL connects formatting, the LLM, and output parsing into one pipeline.
 - Asking the model to respond with **"Unsure about answer"** helps reduce hallucinations by preventing unsupported answers.
+
+---
+
+# Example: Text Classification using PromptTemplate + LCEL
+
+## Objective
+
+Build a text classification pipeline that classifies a piece of text into one of the given categories.
+
+The same PromptTemplate + LCEL workflow is reused. Only the prompt and the input variables are different.
+
+---
+
+## Code Walkthrough
+
+### 1. Store the Text
+
+```python
+text = """
+The concert last night was an exhilarating experience with outstanding performances by all artists.
+"""
+```
+
+### What does this do?
+
+This variable stores the text that needs to be classified.
+
+Instead of embedding the sentence directly into the prompt, it is stored separately so different inputs can be classified without modifying the template.
+
+---
+
+### 2. Store the Categories
+
+```python
+categories = "Entertainment, Food and Dining, Technology, Literature, Music."
+```
+
+### What does this do?
+
+This variable contains all the possible categories that the model can choose from.
+
+Providing the categories guides the LLM and limits the possible outputs.
+
+---
+
+### 3. Create the Prompt Template
+
+```python
+template = """
+Classify the {text} into one of the {categories}.
+
+Category:
+"""
+```
+
+### What does this do?
+
+The PromptTemplate defines the task for the LLM.
+
+It contains two placeholders:
+
+- `{text}` → the sentence to classify.
+- `{categories}` → the list of possible categories.
+
+When the chain runs, LangChain automatically replaces these placeholders with the provided values.
+
+---
+
+### 4. Convert to a PromptTemplate
+
+```python
+prompt = PromptTemplate.from_template(template)
+```
+
+### What does this do?
+
+This converts the normal string into a reusable PromptTemplate.
+
+The same template can now classify any text by simply changing the values of `text` or `categories`.
+
+---
+
+### 5. Create the LCEL Chain
+
+```python
+classification_chain = (
+
+    RunnableLambda(format_prompt)
+
+    |
+
+    llm
+
+    |
+
+    StrOutputParser()
+
+)
+```
+
+### What does this do?
+
+The LCEL chain consists of three components:
+
+- **RunnableLambda(format_prompt)** → fills the placeholders in the prompt.
+- **llm** → processes the formatted prompt and predicts the category.
+- **StrOutputParser()** → converts the model output into a plain string.
+
+The pipe operator (`|`) automatically passes the output of one component to the next.
+
+---
+
+### 6. Execute the Chain
+
+```python
+category = classification_chain.invoke({
+    "text": text,
+    "categories": categories
+})
+```
+
+### What does this do?
+
+The input values are passed as a dictionary.
+
+LangChain automatically:
+
+- replaces the placeholders,
+- sends the completed prompt to the LLM,
+- generates the predicted category,
+- returns the final output.
+
+---
+
+## Overall Workflow
+
+```
+
+Input Text
+
++
+
+Possible Categories
+
+↓
+
+PromptTemplate
+
+↓
+
+Formatted Prompt
+
+↓
+
+LLM
+
+↓
+
+Predicted Category
+
+↓
+
+Output Parser
+
+↓
+
+Final Response
+
+```
+
+---
+
+## Why is this useful?
+
+Classification is one of the most common NLP tasks.
+
+Instead of writing separate code for every classification problem, the same PromptTemplate and LCEL pipeline can be reused simply by changing:
+
+- the input text,
+- the available categories,
+- or the prompt instructions.
+
+The pipeline remains exactly the same.
+
+---
+
+## Key Takeaways
+
+- Store the input text separately from the prompt.
+- Store the possible categories separately so they can be changed easily.
+- PromptTemplate automatically inserts the variables into the prompt.
+- LCEL connects prompt formatting, the LLM, and output parsing into a single workflow.
+- The same pipeline can classify different types of text by changing only the inputs, making the code reusable and modular.
+
