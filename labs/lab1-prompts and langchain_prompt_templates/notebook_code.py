@@ -35,3 +35,58 @@ print(f"response : {response}\n")
 # 4. **Calculate the ground speed:**
 #    \[
 #    \text{Ground speed} =
+
+prompt = """Classify the following statement as true or false: 
+            'The Eiffel Tower is located in Berlin.'
+
+            Answer:
+"""
+response = llm_model(prompt, params)
+print(f"prompt: {prompt}\n")
+print(f"response : {response}\n")
+
+#Output
+# prompt: Classify the following statement as true or false:
+#             'The Eiffel Tower is located in Berlin.'
+#
+#             Answer:
+#
+#
+# response :             False
+#             Explanation:
+#             The Eiffel Tower is located in Paris, France, not in Berlin, Germany.
+#             """
+#         ),
+#         (
+#             "The Great Wall of China is visible from space.",
+#             """
+#             Classify the following statement as true or false:
+#             'The Great Wall of China is visible from space.'
+#
+#             Answer:
+#             False
+#             Explanation:
+#             The Great Wall of China is not visible from space with the naked eye.
+#             This is a common misconception, but astronauts have confirmed that it is not visible from low Earth orbit.
+#             """
+#         ),
+#         (
+#             "The Amazon rainforest is the largest rainforest in the world.",
+#             """
+#             Classify the following statement as true or false:
+#             'The Amazon rainforest is the largest rainforest in the world.'
+#
+#             Answer:
+#             True
+#             Explanation:
+#             The Amazon rainforest is indeed the largest rainforest in the world, covering an area of about 5.5 million square kilometers.
+#             """
+#         ),
+#         (
+#             "The speed of light is slower than the speed of sound.",
+#             """
+#             Classify the following statement as true or false:
+#             'The speed of light is slower than the speed of sound.'
+#
+#             Answer:
+#             False

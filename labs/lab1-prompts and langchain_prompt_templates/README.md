@@ -207,3 +207,147 @@ No new computation happens here.
 - The LLM generates one token at a time.
 - Generation parameters control **how tokens are selected**, not what the model knows.
 - The model's weights never change during inference.
+
+# Zero-Shot Prompting
+
+## Objective
+
+Understand how an LLM performs a task without being given any examples.
+
+The goal of this experiment is to test whether the model can use the knowledge it learned during pre-training to correctly answer a factual question.
+
+---
+
+# Overall Pipeline
+
+User Prompt
+        │
+        ▼
+LLM reads the instruction
+        │
+        ▼
+LLM understands the task
+(True/False Classification)
+        │
+        ▼
+LLM retrieves knowledge from its parameters
+        │
+        ▼
+LLM generates the answer
+
+Unlike few-shot prompting, **no examples are provided** inside the prompt.
+
+---
+
+# Code Walkthrough
+
+## Prompt
+
+```python
+prompt = """
+Classify the following statement as true or false:
+'The Eiffel Tower is located in Berlin.'
+
+Answer:
+"""
+```
+
+### What does this do?
+
+The prompt tells the LLM:
+
+1. What task to perform.
+2. What information to evaluate.
+3. Where to generate the answer.
+
+Notice that **no examples** are provided.
+
+The model has to infer how to solve the task entirely from the instruction.
+
+---
+
+## Why does the model still know the answer?
+
+The model has already been pre-trained on a massive amount of text.
+
+During inference, it does **not search Google** or train itself again.
+
+Instead, it uses the knowledge stored inside its learned parameters (weights).
+
+When it reads
+
+> "The Eiffel Tower is located in Berlin."
+
+it recognizes:
+
+- Eiffel Tower
+- Berlin
+
+and recalls from its learned knowledge that
+
+> Eiffel Tower → Paris
+
+Therefore it predicts:
+
+```
+False
+```
+
+---
+
+## Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The prompt is passed to the language model.
+
+The generation parameters determine **how** the response is generated, while the prompt determines **what** the model is trying to accomplish.
+
+---
+
+## Output
+
+```python
+print(response)
+```
+
+Displays the model's generated answer.
+
+---
+
+# How this fits into the bigger picture
+
+Zero-shot prompting is usually the first technique we try.
+
+It works well when:
+
+- the task is simple
+- the model already has enough knowledge
+- no demonstrations are required
+
+If the model struggles, we can move to:
+
+Zero-shot
+
+↓
+
+One-shot
+
+↓
+
+Few-shot
+
+↓
+
+Fine-tuning (if necessary)
+
+---
+
+# Key Takeaways
+
+- No examples are given to the model.
+- The model relies entirely on knowledge learned during pre-training.
+- The prompt only describes the task.
+- The model's parameters are **not updated** during inference.
