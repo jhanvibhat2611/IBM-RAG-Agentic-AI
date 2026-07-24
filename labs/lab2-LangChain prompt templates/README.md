@@ -423,3 +423,154 @@ The chain manages the complete workflow.
 - The pipe operator (`|`) connects multiple components into a single workflow.
 - `StrOutputParser()` converts the LLM output into a plain string.
 - `invoke()` executes the entire chain from start to finish using only the input variables.
+
+---
+
+# Example: Text Summarization using PromptTemplate + LCEL
+
+## Objective
+
+Use the same PromptTemplate and LCEL pipeline to summarize a long paragraph into a single sentence.
+
+Instead of changing the chain itself, only the prompt template and input data are changed.
+
+---
+
+## Code Walkthrough
+
+### 1. Store the Input Text
+
+```python
+content = """
+Long paragraph...
+"""
+```
+
+### What does this do?
+
+The paragraph that needs to be summarized is stored in a variable.
+
+Keeping the text inside a variable makes it reusable. Instead of rewriting the prompt every time, we can simply replace the value of `content`.
+
+---
+
+### 2. Create the Prompt Template
+
+```python
+template = """
+Summarize the {content} in one sentence.
+"""
+```
+
+### What does this do?
+
+The prompt tells the LLM what task it needs to perform.
+
+`{content}` is a placeholder that will later be replaced with the actual paragraph.
+
+---
+
+### 3. Convert it into a PromptTemplate
+
+```python
+prompt = PromptTemplate.from_template(template)
+```
+
+### What does this do?
+
+This converts the normal string into a reusable PromptTemplate.
+
+Instead of hardcoding the paragraph, the template accepts different input values whenever it is used.
+
+---
+
+### 4. Build the LCEL Chain
+
+```python
+summarize_chain = (
+
+    RunnableLambda(format_prompt)
+
+    |
+
+    llm
+
+    |
+
+    StrOutputParser()
+
+)
+```
+
+### What does this do?
+
+The chain connects three components:
+
+- `RunnableLambda` formats the prompt.
+- `llm` generates the summary.
+- `StrOutputParser()` converts the LLM response into a plain string.
+
+The pipe operator (`|`) automatically passes the output of one component as the input of the next.
+
+---
+
+### 5. Execute the Chain
+
+```python
+summary = summarize_chain.invoke({
+    "content": content
+})
+```
+
+### What does this do?
+
+The dictionary provides the value for the `{content}` placeholder.
+
+The chain then automatically:
+
+- formats the prompt,
+- sends it to the LLM,
+- generates the summary,
+- returns the final output.
+
+---
+
+## Overall Workflow
+
+```
+Long Paragraph
+
+↓
+
+PromptTemplate
+
+↓
+
+Formatted Prompt
+
+↓
+
+LLM
+
+↓
+
+Generated Summary
+
+↓
+
+Output Parser
+
+↓
+
+Final One-Sentence Summary
+```
+
+---
+
+## Key Takeaways
+
+- PromptTemplates are reusable for different NLP tasks.
+- Only the input data changes; the LCEL pipeline remains the same.
+- Long text is stored separately from the prompt, making the code cleaner.
+- The same LangChain workflow can be used for summarization, translation, classification, question answering, and many other tasks simply by changing the prompt template.
+
