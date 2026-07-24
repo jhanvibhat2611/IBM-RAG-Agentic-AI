@@ -509,3 +509,174 @@ The model first observes one example and then applies the same pattern.
 - The example helps the model understand the expected format.
 - No model parameters are updated.
 - The model performs **in-context learning** by recognizing the pattern inside the prompt.
+
+# Few-Shot Prompting
+
+## Objective
+
+Understand how providing **multiple examples** helps the LLM identify a pattern and generalize it to new inputs.
+
+Unlike one-shot prompting, where only one example is given, few-shot prompting provides several demonstrations before asking the model to solve a new task.
+
+---
+
+# Overall Pipeline
+
+User Prompt
+        │
+        ▼
+Multiple Examples (Demonstrations)
+        │
+        ▼
+LLM identifies the common pattern
+        │
+        ▼
+New Input
+        │
+        ▼
+LLM applies the learned pattern
+        │
+        ▼
+Generated Response
+
+The model is not trained again. It simply uses the examples present in the prompt as context to infer the expected behaviour.
+
+---
+
+# Code Walkthrough
+
+## 1. Generation Parameters
+
+```python
+params = {
+    "max_new_tokens": 10
+}
+```
+
+### What does this do?
+
+This controls the maximum length of the generated response.
+
+Since the task is emotion classification, the expected output is only a single emotion such as **Joy**, **Fear**, or **Sadness**. Therefore, only a small number of tokens are required.
+
+---
+
+## 2. Prompt
+
+```python
+prompt = """
+Here are few examples of classifying emotions...
+
+Statement: "I just won my first marathon!"
+Emotion: Joy
+
+Statement: "I can't believe I lost my keys again."
+Emotion: Frustration
+
+Statement: "My best friend is moving to another country."
+Emotion: Sadness
+
+Now classify:
+
+Statement: "That movie was so scary I had to cover my eyes."
+"""
+```
+
+### What does this do?
+
+The prompt first provides **three labelled examples**.
+
+From these examples, the LLM learns:
+
+- the expected input format,
+- the expected output format,
+- the relationship between a statement and its corresponding emotion.
+
+After understanding the pattern, it predicts the emotion for the new statement.
+
+This is called **Few-Shot Prompting** because multiple examples are used to guide the model.
+
+---
+
+## 3. Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The prompt is sent to the LLM.
+
+Instead of relying only on its pre-trained knowledge, the model first studies the examples inside the prompt and then follows the same pattern for the new input.
+
+---
+
+# Why do multiple examples help?
+
+Every example gives the model additional context.
+
+With more demonstrations, the LLM has a better understanding of:
+
+- the task,
+- the expected format,
+- the type of reasoning required.
+
+As a result, the response is usually more reliable than zero-shot prompting, especially for tasks that could be interpreted in multiple ways.
+
+---
+
+# Zero-Shot vs One-Shot vs Few-Shot
+
+### Zero-Shot
+
+```
+Classify the emotion:
+
+"I just won my first marathon."
+```
+
+Only an instruction is provided.
+
+---
+
+### One-Shot
+
+```
+I lost my wallet.
+Emotion: Sadness
+
+Now classify:
+
+I won my first marathon.
+```
+
+One example is provided.
+
+---
+
+### Few-Shot
+
+```
+Example 1
+Input → Output
+
+Example 2
+Input → Output
+
+Example 3
+Input → Output
+
+Now solve:
+
+New Input
+```
+
+Multiple examples are provided before the actual task.
+
+---
+
+# Key Takeaways
+
+- Few-shot prompting provides multiple demonstrations.
+- The model identifies patterns from all the examples.
+- No additional training or fine-tuning takes place.
+- More examples generally improve consistency and accuracy for difficult tasks.
