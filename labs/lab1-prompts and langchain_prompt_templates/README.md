@@ -952,3 +952,147 @@ The model verifies its own reasoning before giving the final answer.
 - The model compares these reasoning paths before selecting the final answer.
 - It improves the reliability and accuracy of responses.
 - It is especially useful for logical reasoning, mathematics, and complex decision-making tasks.
+
+
+# Self-Consistency Prompting
+
+## Objective
+
+Understand how asking the LLM to solve the same problem multiple times using different reasoning paths helps improve the reliability and accuracy of the final answer.
+
+Instead of generating a single response, the model generates multiple independent reasoning paths and then selects the answer that appears most consistent across them.
+
+---
+
+# Overall Pipeline
+
+Problem
+      │
+      ▼
+Prompt requests multiple independent solutions
+      │
+      ▼
+LLM generates several reasoning paths
+      │
+      ├──► Reasoning Path 1
+      ├──► Reasoning Path 2
+      └──► Reasoning Path 3
+      │
+      ▼
+Compare the different results
+      │
+      ▼
+Select the most consistent answer
+      │
+      ▼
+Final Response
+
+Unlike Chain-of-Thought, which produces one reasoning process, Self-Consistency generates multiple reasoning paths before deciding on the final answer.
+
+---
+
+# Code Walkthrough
+
+## 1. Generation Parameters
+
+```python
+params = {
+    "max_new_tokens": 512
+}
+```
+
+### What does this do?
+
+`max_new_tokens = 512` allows the model to generate long responses.
+
+Since the model now needs to produce multiple complete reasoning paths instead of just one answer, it requires a much larger token limit.
+
+---
+
+## 2. Prompt
+
+```python
+prompt = """
+When I was 6, my sister was half of my age.
+Now I am 70, what age is my sister?
+
+Provide three independent calculations and explanations, then determine the most consistent result.
+"""
+```
+
+### What does this do?
+
+The prompt does not simply ask for the answer.
+
+Instead, it instructs the model to:
+
+- solve the problem multiple times,
+- use different reasoning approaches,
+- compare the different solutions,
+- and finally choose the answer that appears most consistent.
+
+This encourages the model to verify its own reasoning before giving the final response.
+
+---
+
+## 3. Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The prompt is sent to the LLM.
+
+Instead of generating one answer immediately, the model creates multiple independent reasoning paths, compares them internally, and then returns the most reliable answer.
+
+---
+
+# Why does Self-Consistency work?
+
+LLMs can sometimes arrive at different answers depending on the reasoning path they follow.
+
+By generating several independent solutions and selecting the answer that appears most consistently, the chances of choosing the correct answer increase.
+
+This makes the output more reliable, especially for complex reasoning tasks.
+
+---
+
+# Chain-of-Thought vs Self-Consistency
+
+### Chain-of-Thought
+
+Problem
+↓
+One reasoning path
+↓
+Final answer
+
+The model explains its reasoning once.
+
+---
+
+### Self-Consistency
+
+Problem
+↓
+Reasoning Path 1
+
+Reasoning Path 2
+
+Reasoning Path 3
+↓
+Compare all reasoning paths
+↓
+Most consistent answer
+
+The model verifies its own reasoning before giving the final answer.
+
+---
+
+# Key Takeaways
+
+- Self-Consistency generates multiple independent reasoning paths.
+- The model compares these reasoning paths before selecting the final answer.
+- It improves the reliability and accuracy of responses.
+- It is especially useful for logical reasoning, mathematics, and complex decision-making tasks.
+

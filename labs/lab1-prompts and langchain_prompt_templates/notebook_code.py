@@ -385,4 +385,40 @@ print(f"response : {response}\n")
 #     initial_apples (int): The initial number of apples in the store.
 #     sold_apples (int): The number of apples sold.
 
+params = {
+    "max_new_tokens": 512,
+}
 
+prompt = """When I was 6, my sister was half of my age. Now I am 70, what age is my sister?
+
+            Provide three independent calculations and explanations, then determine the most consistent result.
+
+"""
+response = llm_model(prompt, params)
+print(f"prompt: {prompt}\n")
+print(f"response : {response}\n")
+
+# Output
+# prompt: When I was 6, my sister was half of my age. Now I am 70, what age is my sister?
+#
+#             Provide three independent calculations and explanations, then determine the most consistent result.
+#
+#
+#
+# response :             Calculation 1:
+#             When you were 6, your sister was half your age, which means she was 3 years old.
+#             The age difference between you and your sister is 6 - 3 = 3 years.
+#             Now that you are 70, your sister's age would be 70 - 3 = 67 years old.
+#
+#             Calculation 2:
+#             Let's denote your sister's age when you were 6 as S.
+#             According to the given information, S = 6 / 2 = 3.
+#             The age difference between you and your sister is 6 - 3 = 3 years.
+#             Now that you are 70, your sister's age would be 70 - 3 = 67 years old.
+#
+#             Calculation 3:
+#             If your sister was half your age when you were 6, it means she was 3 years old at that time.
+#             The time that has passed since then is 70 - 6 = 64 years.
+#             Therefore, your sister's current age would be 3 + 64 = 67 years old.
+#
+#             The most consistent result across all three calculations is that your sister is now 67 years old.
