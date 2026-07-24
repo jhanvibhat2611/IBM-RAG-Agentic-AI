@@ -351,3 +351,161 @@ Fine-tuning (if necessary)
 - The model relies entirely on knowledge learned during pre-training.
 - The prompt only describes the task.
 - The model's parameters are **not updated** during inference.
+
+# One-Shot Prompting
+
+## Objective
+
+Understand how providing **one example** helps an LLM learn the expected output format and apply the same pattern to a new input.
+
+Unlike zero-shot prompting, the model is given **one demonstration** before solving the actual task.
+
+---
+
+# Overall Pipeline
+
+User Prompt
+        │
+        ▼
+One Example (Demonstration)
+        │
+        ▼
+LLM learns the expected pattern
+        │
+        ▼
+New Input
+        │
+        ▼
+LLM applies the same pattern
+        │
+        ▼
+Generated Response
+
+The example acts as a guide for the model. The model does not retrain itself—it simply infers the pattern from the example provided in the prompt.
+
+---
+
+# Code Walkthrough
+
+## 1. Generation Parameters
+
+```python
+params = {
+    "max_new_tokens": 20,
+    "temperature": 0.1,
+}
+```
+
+### What does this do?
+
+These parameters control **how the response is generated**.
+
+- `max_new_tokens = 20`
+  - Limits the response length.
+  - Since translation responses are short, a small limit is sufficient.
+
+- `temperature = 0.1`
+  - Makes the model highly deterministic.
+  - Translation has one primary goal—accuracy—so we don't want creative or random outputs.
+
+---
+
+## 2. Prompt
+
+```python
+prompt = """
+Here is an example of translating a sentence from English to French:
+
+English: "How is the weather today?"
+French: "Comment est le temps aujourd'hui?"
+
+Now, translate the following sentence from English to French:
+
+English: "Where is the nearest supermarket?"
+"""
+```
+
+### What does this do?
+
+This prompt contains **one complete example** of the task.
+
+The example teaches the LLM:
+
+- the input language (English),
+- the output language (French),
+- the formatting style to follow.
+
+The model then applies the same pattern to the new sentence.
+
+This is why it is called **One-Shot Prompting**.
+
+---
+
+## 3. Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The prompt and generation parameters are sent to the LLM.
+
+The model first understands the example, then applies the same translation pattern to the new sentence.
+
+---
+
+## Why does one example help?
+
+LLMs are very good at recognizing patterns.
+
+Instead of explicitly programming translation rules, we simply **show one example**, and the model infers the format and expected behaviour.
+
+It is essentially saying:
+
+```
+Input A → Output A
+
+Now...
+
+Input B → ?
+```
+
+The model predicts Output B by following the demonstrated pattern.
+
+---
+
+# One-Shot vs Zero-Shot
+
+### Zero-Shot
+
+```
+Translate:
+
+"Where is the nearest supermarket?"
+```
+
+The model receives only an instruction.
+
+---
+
+### One-Shot
+
+```
+English → French
+Hello → Bonjour
+
+Now...
+
+English → French
+Where is the nearest supermarket?
+```
+
+The model first observes one example and then applies the same pattern.
+
+---
+
+# Key Takeaways
+
+- One-shot prompting provides exactly one example.
+- The example helps the model understand the expected format.
+- No model parameters are updated.
+- The model performs **in-context learning** by recognizing the pattern inside the prompt.
