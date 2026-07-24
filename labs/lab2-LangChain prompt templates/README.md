@@ -574,3 +574,196 @@ Final One-Sentence Summary
 - Long text is stored separately from the prompt, making the code cleaner.
 - The same LangChain workflow can be used for summarization, translation, classification, question answering, and many other tasks simply by changing the prompt template.
 
+---
+
+# Example: Question Answering using PromptTemplate + LCEL
+
+## Objective
+
+Build a simple Question Answering (QA) pipeline where the LLM answers a question **only using the provided context**.
+
+Unlike a normal prompt where the model can answer from its general knowledge, this prompt explicitly instructs the model to use the given content. If the answer cannot be found in the content, the model should respond with **"Unsure about answer"**.
+
+---
+
+## Code Walkthrough
+
+### 1. Store the Context
+
+```python
+content = """
+The solar system consists of...
+"""
+```
+
+### What does this do?
+
+The information that the LLM should use is stored inside the `content` variable.
+
+Instead of embedding the paragraph directly inside the prompt, it is stored separately so that different documents can be passed later without changing the prompt itself.
+
+---
+
+### 2. Store the Question
+
+```python
+question = "Which planets in the solar system are rocky and solid?"
+```
+
+### What does this do?
+
+The user's question is stored separately.
+
+Keeping the question as a variable allows the same prompt template to answer different questions by simply changing the value of `question`.
+
+---
+
+### 3. Create the Prompt Template
+
+```python
+template = """
+Answer the {question} based on the {content}.
+
+Respond "Unsure about answer" if not sure about the answer.
+
+Answer:
+"""
+```
+
+### What does this do?
+
+This template defines the instructions that the LLM should follow.
+
+It contains two placeholders:
+
+- `{question}` → the user's question.
+- `{content}` → the context the model should use.
+
+The prompt also tells the LLM **not to guess**. If the answer is not present in the provided context, it should return **"Unsure about answer"** instead of making up information.
+
+This is a simple way to reduce hallucinations.
+
+---
+
+### 4. Convert to a PromptTemplate
+
+```python
+prompt = PromptTemplate.from_template(template)
+```
+
+### What does this do?
+
+This converts the normal string into a reusable PromptTemplate.
+
+Whenever new values for `question` and `content` are provided, LangChain automatically replaces the placeholders.
+
+---
+
+### 5. Create the LCEL Chain
+
+```python
+qa_chain = (
+
+    RunnableLambda(format_prompt)
+
+    |
+
+    llm
+
+    |
+
+    StrOutputParser()
+
+)
+```
+
+### What does this do?
+
+The chain has three stages:
+
+- **RunnableLambda(format_prompt)** → replaces the placeholders with actual values.
+- **llm** → sends the completed prompt to the language model.
+- **StrOutputParser()** → converts the model output into a plain Python string.
+
+The pipe operator (`|`) automatically passes the output from one component to the next.
+
+---
+
+### 6. Run the Chain
+
+```python
+answer = qa_chain.invoke({
+    "question": question,
+    "content": content
+})
+```
+
+### What does this do?
+
+The dictionary provides values for both placeholders.
+
+The pipeline then:
+
+- formats the prompt,
+- inserts the question and context,
+- sends the prompt to the LLM,
+- generates an answer,
+- returns the final response.
+
+---
+
+## Overall Workflow
+
+```
+
+Context
+
++
+
+Question
+
+↓
+
+PromptTemplate
+
+↓
+
+Formatted Prompt
+
+↓
+
+LLM
+
+↓
+
+Answer
+
+↓
+
+Output Parser
+
+↓
+
+Final Response
+
+```
+
+---
+
+## Why is this important?
+
+This is one of the simplest forms of **context-aware question answering**.
+
+Instead of answering from everything the model knows, we first provide the information that the model is allowed to use.
+
+Although this example uses a small paragraph, the same workflow is later used in **Retrieval-Augmented Generation (RAG)**, where the `content` is retrieved from documents or a vector database before being passed to the LLM.
+
+---
+
+## Key Takeaways
+
+- Store the context separately from the prompt.
+- Store the question separately so the same template can answer multiple questions.
+- PromptTemplate automatically fills the placeholders.
+- LCEL connects formatting, the LLM, and output parsing into one pipeline.
+- Asking the model to respond with **"Unsure about answer"** helps reduce hallucinations by preventing unsupported answers.

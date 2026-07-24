@@ -57,3 +57,35 @@ print(summary)
 # Output
 # The rapid advancement of technology, including AI, machine learning, and IoT, has transformed healthcare, education,
 # and transportation, enhancing productivity and fostering a more interconnected society.
+
+content = """
+    The solar system consists of the Sun, eight planets, their moons, dwarf planets, and smaller objects like asteroids and comets. 
+    The inner planets—Mercury, Venus, Earth, and Mars—are rocky and solid. 
+    The outer planets—Jupiter, Saturn, Uranus, and Neptune—are much larger and gaseous.
+"""
+
+question = "Which planets in the solar system are rocky and solid?"
+
+template = """
+    Answer the {question} based on the {content}.
+    Respond "Unsure about answer" if not sure about the answer.
+
+    Answer:
+
+"""
+prompt = PromptTemplate.from_template(template)
+
+# Create the LCEL chain
+qa_chain = (
+        RunnableLambda(format_prompt)
+        | llm
+        | StrOutputParser()
+)
+
+# Run the chain
+answer = qa_chain.invoke({"question": question, "content": content})
+print(answer)
+
+# Output
+# The rocky, solid planets in our solar system are Mercury, Venus, Earth, and Mars.
+
