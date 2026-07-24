@@ -240,3 +240,149 @@ print(f"response : {response}\n")
 #
 # response: Emotion: Fear
 
+params = {
+    "max_new_tokens": 512,
+    "temperature": 0.5,
+}
+
+prompt = """Consider the problem: 'A store had 22 apples. They sold 15 apples today and got a new delivery of 8 apples. 
+            How many apples are there now?’
+
+            Break down each step of your calculation
+
+"""
+response = llm_model(prompt, params)
+print(f"prompt: {prompt}\n")
+print(f"response : {response}\n")
+
+# Output
+# prompt: Consider
+# the
+# problem: 'A store had 22 apples. They sold 15 apples today and got a new delivery of 8 apples.
+# How
+# many
+# apples
+# are
+# there
+# now?’
+#
+# Break
+# down
+# each
+# step
+# of
+# your
+# calculation
+#
+# response: Step
+# 1: Identify
+# the
+# initial
+# quantity
+# of
+# apples.
+# Step
+# 2: Determine
+# the
+# number
+# of
+# apples
+# sold.
+# Step
+# 3: Calculate
+# the
+# remaining
+# apples
+# after
+# the
+# sale.
+# Step
+# 4: Identify
+# the
+# number
+# of
+# apples
+# received in the
+# new
+# delivery.
+# Step
+# 5: Calculate
+# the
+# total
+# number
+# of
+# apples
+# after
+# the
+# delivery.
+# Step
+# 6: State
+# the
+# final
+# answer.
+#
+# Step
+# 1: The
+# store
+# initially
+# had
+# 22
+# apples.
+# Step
+# 2: The
+# store
+# sold
+# 15
+# apples
+# today.
+# Step
+# 3: After
+# selling
+# 15
+# apples, the
+# store
+# had
+# 22 - 15 = 7
+# apples
+# remaining.
+# Step
+# 4: The
+# store
+# received
+# a
+# new
+# delivery
+# of
+# 8
+# apples.
+# Step
+# 5: After
+# receiving
+# the
+# new
+# delivery, the
+# store
+# had
+# 7 + 8 = 15
+# apples in total.
+# Step
+# 6: Therefore, the
+# store
+# now
+# has
+# 15
+# apples.
+# `
+#
+# ```python
+#
+#
+# def solve_apple_problem(initial_apples, sold_apples, delivered_apples):
+#     """
+#     Solves the apple problem by breaking down the calculation into steps.
+#
+#     Parameters:
+#     initial_apples (int): The initial number of apples in the store.
+#     sold_apples (int): The number of apples sold.
+
+

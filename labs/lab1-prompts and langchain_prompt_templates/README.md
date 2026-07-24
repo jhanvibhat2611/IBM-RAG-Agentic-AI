@@ -680,3 +680,275 @@ Multiple examples are provided before the actual task.
 - The model identifies patterns from all the examples.
 - No additional training or fine-tuning takes place.
 - More examples generally improve consistency and accuracy for difficult tasks.
+
+
+# Chain-of-Thought Prompting
+
+## Objective
+
+Understand how asking the LLM to reason step-by-step improves its performance on problems that require logical thinking or multiple calculations.
+
+Instead of asking only for the final answer, we explicitly tell the model to explain its reasoning process.
+
+---
+
+# Overall Pipeline
+
+Problem
+      │
+      ▼
+Prompt asks for step-by-step reasoning
+      │
+      ▼
+LLM breaks the problem into smaller logical steps
+      │
+      ▼
+Intermediate reasoning
+      │
+      ▼
+Final Answer
+
+Unlike Zero-Shot or Few-Shot prompting, the focus here is **not on giving examples**. Instead, we guide *how* the model should think.
+
+---
+
+# Code Walkthrough
+
+## 1. Generation Parameters
+
+```python
+params = {
+    "max_new_tokens": 512,
+    "temperature": 0.5
+}
+```
+
+### What does this do?
+
+### `max_new_tokens = 512`
+
+Allows the model to generate a much longer response.
+
+Since the model now has to explain every reasoning step before reaching the answer, it needs many more tokens than a simple classification task.
+
+### `temperature = 0.5`
+
+Keeps the output balanced.
+
+The model can still explain naturally, but it stays reasonably consistent and doesn't become overly random.
+
+---
+
+## 2. Prompt
+
+```python
+prompt = """
+Consider the problem:
+
+A store had 22 apples.
+They sold 15 apples today and got a new delivery...
+
+Break down each step of your calculation.
+"""
+```
+
+### What does this do?
+
+Instead of asking:
+
+> "How many apples are there?"
+
+we ask
+
+> "Break down each step of your calculation."
+
+This changes **how the LLM generates its response**.
+
+Rather than jumping directly to the answer, it first performs intermediate reasoning and then arrives at the final answer.
+
+---
+
+## 3. Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The complete prompt is sent to the LLM.
+
+Because the prompt explicitly requests step-by-step reasoning, the model generates its reasoning first and then produces the final answer.
+
+---
+
+# Why does Chain-of-Thought work?
+
+Complex problems usually involve multiple logical steps.
+
+If the model is forced to think through every step, it is less likely to skip important information or make calculation mistakes.
+
+Breaking a large problem into smaller reasoning steps often leads to more accurate answers.
+
+---
+
+# When should it be used?
+
+Chain-of-Thought prompting is useful for tasks involving:
+
+- Mathematical calculations
+- Logical reasoning
+- Multi-step decision making
+- Complex problem solving
+- Situations where understanding the reasoning is important
+
+It is generally unnecessary for simple tasks like translation or sentiment classification.
+
+---
+
+# Key Takeaways
+
+- Chain-of-Thought prompting tells the LLM to reason step by step.
+- The model generates intermediate reasoning before producing the final answer.
+- It improves accuracy on complex reasoning tasks.
+- Longer reasoning requires a larger `max_new_tokens` value.
+
+# Self-Consistency Prompting
+
+## Objective
+
+Understand how asking the LLM to solve the same problem multiple times using different reasoning paths helps improve the reliability and accuracy of the final answer.
+
+Instead of generating a single response, the model generates multiple independent reasoning paths and then selects the answer that appears most consistent across them.
+
+---
+
+# Overall Pipeline
+
+Problem
+      │
+      ▼
+Prompt requests multiple independent solutions
+      │
+      ▼
+LLM generates several reasoning paths
+      │
+      ├──► Reasoning Path 1
+      ├──► Reasoning Path 2
+      └──► Reasoning Path 3
+      │
+      ▼
+Compare the different results
+      │
+      ▼
+Select the most consistent answer
+      │
+      ▼
+Final Response
+
+Unlike Chain-of-Thought, which produces one reasoning process, Self-Consistency generates multiple reasoning paths before deciding on the final answer.
+
+---
+
+# Code Walkthrough
+
+## 1. Generation Parameters
+
+```python
+params = {
+    "max_new_tokens": 512
+}
+```
+
+### What does this do?
+
+`max_new_tokens = 512` allows the model to generate long responses.
+
+Since the model now needs to produce multiple complete reasoning paths instead of just one answer, it requires a much larger token limit.
+
+---
+
+## 2. Prompt
+
+```python
+prompt = """
+When I was 6, my sister was half of my age.
+Now I am 70, what age is my sister?
+
+Provide three independent calculations and explanations, then determine the most consistent result.
+"""
+```
+
+### What does this do?
+
+The prompt does not simply ask for the answer.
+
+Instead, it instructs the model to:
+
+- solve the problem multiple times,
+- use different reasoning approaches,
+- compare the different solutions,
+- and finally choose the answer that appears most consistent.
+
+This encourages the model to verify its own reasoning before giving the final response.
+
+---
+
+## 3. Model Invocation
+
+```python
+response = llm_model(prompt, params)
+```
+
+The prompt is sent to the LLM.
+
+Instead of generating one answer immediately, the model creates multiple independent reasoning paths, compares them internally, and then returns the most reliable answer.
+
+---
+
+# Why does Self-Consistency work?
+
+LLMs can sometimes arrive at different answers depending on the reasoning path they follow.
+
+By generating several independent solutions and selecting the answer that appears most consistently, the chances of choosing the correct answer increase.
+
+This makes the output more reliable, especially for complex reasoning tasks.
+
+---
+
+# Chain-of-Thought vs Self-Consistency
+
+### Chain-of-Thought
+
+Problem
+↓
+One reasoning path
+↓
+Final answer
+
+The model explains its reasoning once.
+
+---
+
+### Self-Consistency
+
+Problem
+↓
+Reasoning Path 1
+
+Reasoning Path 2
+
+Reasoning Path 3
+↓
+Compare all reasoning paths
+↓
+Most consistent answer
+
+The model verifies its own reasoning before giving the final answer.
+
+---
+
+# Key Takeaways
+
+- Self-Consistency generates multiple independent reasoning paths.
+- The model compares these reasoning paths before selecting the final answer.
+- It improves the reliability and accuracy of responses.
+- It is especially useful for logical reasoning, mathematics, and complex decision-making tasks.
